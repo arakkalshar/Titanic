@@ -1,5 +1,6 @@
 import streamlit as st
 import pandas as pd
+import os
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.preprocessing import OneHotEncoder
 from sklearn.compose import ColumnTransformer
@@ -7,15 +8,14 @@ from sklearn.pipeline import Pipeline
 
 @st.cache_resource
 def train_model():
-    df = pd.read_csv("titanic.csv")
+    base = os.path.dirname(__file__)
+    df = pd.read_csv(os.path.join(base, "titanic.csv"))
     X = df[["Pclass", "Sex", "Age", "Fare"]]
     y = df["Survived"]
-
     preprocessor = ColumnTransformer(transformers=[
         ("cat", OneHotEncoder(), ["Pclass", "Sex"]),
         ("num", "passthrough", ["Age", "Fare"])
     ])
-
     model = Pipeline(steps=[
         ("preprocessor", preprocessor),
         ("classifier", RandomForestClassifier(n_estimators=100, random_state=42))
